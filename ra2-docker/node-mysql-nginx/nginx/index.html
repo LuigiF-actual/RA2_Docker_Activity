@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Node.js, MySQL and Nginx</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; color: #1f2937; }
+    table { border-collapse: collapse; width: min(700px, 100%); }
+    th, td { border: 1px solid #d1d5db; padding: .65rem; text-align: left; }
+    th { background: #111827; color: #fff; }
+    #status { color: #047857; }
+  </style>
+</head>
+<body>
+  <h1>Products from MySQL</h1>
+  <p id="status">Loading products...</p>
+  <table>
+    <thead><tr><th>ID</th><th>Name</th><th>Category</th><th>Price</th></tr></thead>
+    <tbody id="products"></tbody>
+  </table>
+  <script>
+    const tableBody = document.getElementById("products");
+    const status = document.getElementById("status");
+    fetch("/api/products")
+      .then((response) => {
+        if (!response.ok) throw new Error("API request failed");
+        return response.json();
+      })
+      .then((products) => {
+        tableBody.innerHTML = products.map((product) =>
+          `<tr><td>${product.id}</td><td>${product.name}</td><td>${product.category}</td><td>EUR ${Number(product.price).toFixed(2)}</td></tr>`
+        ).join("");
+        status.textContent = `${products.length} products loaded from MySQL.`;
+      })
+      .catch(() => {
+        status.textContent = "The products could not be loaded.";
+        status.style.color = "#b91c1c";
+      });
+  </script>
+</body>
+</html>
